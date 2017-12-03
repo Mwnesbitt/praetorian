@@ -1,5 +1,3 @@
-praetorian project copied from mastermind project.
-
 This is an adaptation of my mastermind project to the praetorian challenge.
 
 Unfortunately, those sneaky praetorians added a level (level 4) that blows up the "dontbedumb" runtime.  Looking at the runtime analysis I did previously for the mastermind project strongly implies that 6 slots and 25 colors won't be cracked by my algo for a very, very long time.  Certainly not within the 10 seconds that the praetorian API allows between guesses.
