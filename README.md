@@ -2,7 +2,7 @@ This is an adaptation of my mastermind project to the praetorian challenge.
 
 Unfortunately, those sneaky praetorians added a level (level 4) that blows up the "dontbedumb" runtime.  Looking at the runtime analysis I did previously for the mastermind project strongly implies that 6 slots and 25 colors won't be cracked by my algo for a very, very long time.  Certainly not within the 10 seconds that the praetorian API allows between guesses.
 
-As a pathetic ditch attempt, when the time gets to 9.5 seconds after my last guess, I guess either a random guess or the guess that I was currently checking to see if it was dumb.  This, of course, also has very little realistic chance of working.  But now instead of failing by timing out, I fail by exhausing my allowed number of guesses.  Hooray!
+As a pathetic ditch attempt, when the time gets to 9.5 seconds after my last guess, I guess either a random guess or the guess that I was currently checking to see if it was dumb.  This, of course, also has very little realistic chance of working.  But now instead of failing by timing out, I fail by exhausing my allowed number of guesses.  Small victories.
 
 The other pathetic ditch attempt was to run this algo on a server, which has 16 cores instead of 4 (with hyperthreading).  This dramatically sped up my shadowcrack project from earlier this year.
 
