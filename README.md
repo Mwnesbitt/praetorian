@@ -12,3 +12,8 @@ This is also unlikely to work.  What I really need is a guess generation algorit
 
 I'd have to put some time into figuring out what this new guess generation algorithm should be so I'm going to put a pin in the project here. 
 
+Well I got lucky, got my hash, hope it doesn't expire, but I can always do the same thing again if I have to
+
+ripped through the later rounds with just a couple code modifications to handle it afterwards.  
+
+Was planning on trying to generate guesses faster with threading-- that would still be a nice upgrade so you don't have to do my terrible hack of repeating it over and over and getting it ~1/25 times.

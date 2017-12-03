@@ -5,6 +5,12 @@
 import requests, json, sys
 import random
 import time
+import threading
+
+def main():
+    pass
+
+
 
 def getHeaders(useremail):
     email = useremail
@@ -23,7 +29,6 @@ def randomGuess(colors, slots): #This is a ditch attempt at solving level 4.  I 
         return result
 
 def generateGuess(guesses, colors, slots, history):
-    starttime = time.time()
     if history == []:
         guess = list(range(slots)) #formerly no if statement and just restarted cycle each time, but runtime cause API timeout
     else:
@@ -37,10 +42,6 @@ def generateGuess(guesses, colors, slots, history):
         if(len(guess) != len(set(guess))): #no dupes allowed
             guess = incrementGuess(guess, colors)
             continue
-        elapsedtime = time.time() - starttime
-        if elapsedtime > 9.5: #ditch attempt at solving level 4 while still using a slow AF guess generation algo.  One way to solve this more quickly without having a super smart algo would be just to spot guesses where 0 colors were correct, then never cycle through those.
-            return guess
-            #return randomGuess(colors, slots) 
         for item in history:
             if(guess == item[0]): #If candidate guess was guessed before, its dumb
                 goodguess = False
@@ -138,29 +139,6 @@ def solveRound(roundnum,headers):
         temp.append(score)
         history.append(temp)
         print(history)
-
-def main():
-    headers = getHeaders("mwnesbitt@gmail.com")
-    if len(sys.argv) == 2:
-        if sys.argv[1] == "reset":
-            r = requests.post('https://mastermind.praetorian.com/reset/', headers=headers)
-            print(r.text)
-        if sys.argv[1] == "hash":
-            r = requests.get('https://mastermind.praetorian.com/hash/', headers=headers)
-            print(r.text)
-    else: 
-        i = 1; #manually change to 5 after the brute forcing of level 4
-        while i < 7:
-            tempresult = solveRound(i, headers)
-            print(tempresult, "(in main)")
-            print("Just solved level %d (in main)" %i)
-            if 'message' not in tempresult: #this is when there are multiple rounds with the same number of guesses so we don't want to increment i
-                continue
-            else:
-                print(tempresult['message'], "(in main)")
-                i+=1
-                if not tempresult['message'] == "Onto the next level":
-                    break
 
 if __name__ == '__main__':
     main()
