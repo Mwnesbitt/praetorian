@@ -1,3 +1,5 @@
+MASTERMIND/gladiator.py
+
 This is an adaptation of my mastermind project to the praetorian challenge.
 
 Unfortunately, those sneaky praetorians added a level (level 4) that blows up the "dontbedumb" guess generation runtime.  Looking at the runtime analysis I did previously for the mastermind project strongly implies that 6 slots and 25 colors won't be cracked by my dontbedumb algo for a very, very long time.  Certainly not within the 10 seconds that the praetorian API allows between guesses.
@@ -15,3 +17,18 @@ Well I got lucky, got my hash, hope it doesn't expire, but I can always do the s
 ripped through the later rounds with just a couple code modifications to handle it afterwards.  
 
 Was planning on trying to generate guesses faster with threading-- that would still be a nice upgrade so you don't have to do my terrible hack of repeating it over and over and getting it ~1/25 times.
+
+
+
+ROTA
+algo: 
+(legal moves)
+forced moves
+non-blunder moves
+move out of center but not to single spaces-- only to doubled spaces
+don't move to middle
+pick randomly
+
+(There may be another trap situation-- "move towards gravity" -- but I'll start with the rules above and analyze why I lose.
+
+Important to have a good way to represent the game that you can easily understand when analyzing why your strategy is failing.
