@@ -31,6 +31,7 @@ class Position(object):
         print("Player:" ,self.player)
         print("Center:" ,self.center)
         print("Loop:" ,self.loop)
+        if self.isWon(): print("GAME IS OVER")
 
     def allCheckers(self):
         if self.center == '':
@@ -71,7 +72,8 @@ class Position(object):
         return result
 
     def applyMove(self, moveobject):
-        if not self.isLegalMove(moveobject): sys.exit("That move isn't legal")
+        #if not self.isLegalMove(moveobject): sys.exit("That move isn't legal")
+        if not self.isLegalMove(moveobject): return "BLARGH"
         newplayer = otherPlayer(self.player)
         newcenter = self.center
         newloop = self.loop[:] #pointer hell...
@@ -108,14 +110,15 @@ class Position(object):
     #pos.printme()
     #Player: W
     #Center: 
-    #Loop: ['B', 'B', '', 'W', '', '', 'W', ''] actually white is already screwed here
-    #mov = pos.notDumbMove() #This created a dumb move!
+    #Loop: ['B', 'B', '', 'W', '', '', 'W', ''] actually white is already screwed here.  WE GOT TRAPPED!
+    #mov = pos.notDumbMove() #This created a dumb move! WRONG-- all moves were blunders since we were trapped.  Need better opening logic.
     #mov.printme()
     #Player: W
     #Origin: new
     #Destination: center
     def isBlunder(self, moveobject):
-        if not self.isLegalMove(moveobject): sys.exit("That move isn't legal")
+        #if not self.isLegalMove(moveobject): sys.exit("That move isn't legal")
+        if not self.isLegalMove(moveobject): return "BLARGH" 
         nextPosition = self.applyMove(moveobject)
         threatmoves = nextPosition.legalMoves()
         result = False
@@ -148,12 +151,18 @@ class Position(object):
                 newcandidates.append(move)
         if len(newcandidates) == 1: return newcandidates[0]
         if len(newcandidates) == 0: return candidates[0] #we got trapped
+
+        #Blocking an early trap, e.g. white is trapped ['','B','B', '', 'W', '', 'W','']
+        if not self.allCheckers(): 
+            for index, piece in enumerate(self.loop):
+                if piece == '' and self.loop[index-2] == '' and self.loop[index-1] == otherPlayer(self.player):
+                    return Move(self.player, 'new', index)
         
         #strategery time #SHOULD THIS SECTION BE USING newcandidates?
         if self.center == self.player: #check if the player has a piece in the middle.
             doubleopen = False
             for index, piece in enumerate(self.loop):
-                if piece == '' and self.loop[index + 1] == '':
+                if piece == '' and self.loop[(index + 1)%8] == '':
                     doubleopen = True
                     chosenspot = (index + random.randint(0,1)) %8
             if doubleopen: #check if there are two adjacent open spaces.  If yes, move to one of them randomly
