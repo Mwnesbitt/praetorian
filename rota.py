@@ -72,8 +72,8 @@ class Position(object):
         return result
 
     def applyMove(self, moveobject):
-        #if not self.isLegalMove(moveobject): sys.exit("That move isn't legal")
-        if not self.isLegalMove(moveobject): return "BLARGH"
+        if not self.isLegalMove(moveobject): sys.exit("That move isn't legal")
+        #if not self.isLegalMove(moveobject): return "BLARGH"
         newplayer = otherPlayer(self.player)
         newcenter = self.center
         newloop = self.loop[:] #pointer hell...

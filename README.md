@@ -32,3 +32,5 @@ pick randomly
 (There may be another trap situation-- "move towards gravity" -- but I'll start with the rules above and analyze why I lose.
 
 Important to have a good way to represent the game that you can easily understand when analyzing why your strategy is failing.
+
+Currently a WIP; rota.py plays a drawing strategy that I *think* works but still hasn't been battle tested and can't be until I get the interface with the API set up and start playing games.
