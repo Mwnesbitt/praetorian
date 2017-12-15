@@ -66,34 +66,43 @@ def runGame():
     cookies, gamedata= initialize()
 
     for k in range(2):
-        print("\n\n\n GAMES WON:"+str(k)+"\n\n")
+        print("\n\n\n#########\nGAMES WON:"+str(k)+"\n#########\n\n\n")
+        print("Initial Position from API")
         print(gamedata)
         pos = makePosition(gamedata, 'p')
         pos.printme()
 
         for i in range(3):
-            print("\nGAME "+str(k+1))
-            print("PLACING CHECKERS\n")
+            print("\n\nGAME "+str(k+1))
+            print("PLACING CHECKERS")
+            print("\nCurrent Position:")
+            pos.printme()
             mov = pos.notDumbMove()
+            print("\nPlayer Move:")
             mov.printme()
             gamedata = place(cookies, convertMove(mov.destination))
+            print("\nAPI Response:")
             print(gamedata)
             pos = makePosition(gamedata, 'p')
+            print("\nNew Position:")
             pos.printme()
 
         for i in range(32):
-            print("\nGAME "+str(k+1))
-            print("TURN "+ str(i)+" \n")
+            print("\n\nGAME "+str(k+1))
+            print("TURN "+ str(i))
+            print("\nCurrent Position:")
+            pos.printme()
             mov = pos.notDumbMove()
+            print("\nPlayer Move:")
             mov.printme()
             gamedata = move(cookies, convertMove(mov.origin), convertMove(mov.destination))
+            print("\nAPI Response:")
             print(gamedata)
             pos = makePosition(gamedata, 'p')
+            print("\nNew Position:")
             pos.printme()
 
         gamedata = nextGame(cookies)
-        print(gamedata)
-
 
 runGame()
 
