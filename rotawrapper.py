@@ -9,9 +9,8 @@ def initialize():
     s = requests.Session()
     r = s.get(url+"?request=new&email=mwnesbitt@gmail.com")
     response = r.json()
-    #print(response)
-    if response['status'] == "fail": print("FAILURE")
-    else: print("SUCCESS")
+    if response['status'] == "fail": print("SESSION FAILURE")
+    else: print("SESSION ESTABLISHED")
     return s, response['data']
 
 def place(session, dest):
@@ -27,7 +26,6 @@ def convertChar(char):
     if char == '-': return ''
 
 def makePosition(gamedata, playerjunk):
-    #need player, center, loop
     board = gamedata['board']
     center = convertChar(board[4])
     loopjunk = [board[1], board[2], board[5], board[8], board[7], board[6],board[3], board[0]]
@@ -37,7 +35,7 @@ def makePosition(gamedata, playerjunk):
     player = convertChar(playerjunk)
     return rota.Position(player, center, loop)
 
-def convertMove(des):#NEED TO UPDATE FOR POST-PLACEMENT
+def convertMove(des):
     if des == 'center': return "5"
     if des == 0: return "2"
     if des == 1: return "3"
@@ -65,7 +63,7 @@ def nextGame(session):
 def runGame():
     cookies, gamedata= initialize()
 
-    for k in range(2):
+    for k in range(50):
         print("\n\n\n#########\nGAMES WON:"+str(k)+"\n#########\n\n\n")
         print("Initial Position from API")
         print(gamedata)
@@ -73,7 +71,7 @@ def runGame():
         pos.printme()
 
         for i in range(3):
-            print("\n\nGAME "+str(k+1))
+            print("\n\nGAME "+str(k))
             print("PLACING CHECKERS")
             print("\nCurrent Position:")
             pos.printme()
@@ -88,7 +86,7 @@ def runGame():
             pos.printme()
 
         for i in range(32):
-            print("\n\nGAME "+str(k+1))
+            print("\n\nGAME "+str(k))
             print("TURN "+ str(i))
             print("\nCurrent Position:")
             pos.printme()
@@ -103,11 +101,10 @@ def runGame():
             pos.printme()
 
         gamedata = nextGame(cookies)
+    print(gamedata) #should have the hash in it?
+    r = cookies.get('https://rota.praetorian.com/rota/service/play.php?request=status')
+    response = r.json()
+    print(response)
 
-runGame()
-
-
-
-
-
-
+if __name__ == '__main__':
+    runGame()

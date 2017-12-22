@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 #Mark Nesbitt
 
-#make sure you can easily play the game from the interpreter-- need some kind of vehicle for stepping through positions
-
 import random
 import sys
 
@@ -129,20 +127,57 @@ class Position(object):
                 break
         return result
 
+    def isOpeningBlunder(self, moveobject):
+        if self.allCheckers(): return False
+        if moveobject.destination == 'center': return False #Kind of bad practice, but I know that I never go to the center unless I have to...
+
+        if self.center == '':
+            count = self.loop.count(self.player)
+            if count == 1:
+                if (moveobject.destination -4) % 8 == self.loop.index(self.player): return True  #Addresses: New game.  White to 7, black to 0, white to 3 (threatening), black to center (blocking and threatening), white to 4 (blocking), black to 5 (forcing win).
+                if moveobject.destination == (self.loop.index(self.player) +1) %8 or moveobject.destination == (self.loop.index(self.player) -1 ) % 8 : return True  #Addresses: New game: White moves to 1, black to zero, white to 2.  This is an error, but its one move beyond the vision of allowsForcedMove.  Black plays to 3, and white is screwed.  Note that because your algo is working, specifically the allowsForcedMove function is working, this means that white will always move to the center in this situation, because the loss just came into sight. The rule needs to be: when laying checkers, do not put any of your checkers side by side on the loop.
+                #Next two lines are total hacks for the unexplained loss below
+                if self.loop.index(self.player) == (moveobject.destination -2) % 8 and self.loop[(self.loop.index(otherPlayer(self.player)) -1) %8] != '': return True
+                if self.loop.index(self.player) == (moveobject.destination +2) % 8 and self.loop[(self.loop.index(otherPlayer(self.player)) +1) %8] != '': return True
+            elif count == 2:
+                l = []
+                for index, piece in enumerate(self.loop):
+                    if piece == self.player: l.append(index)
+                m = moveobject.destination
+                if m == l[0] + 1 or m == l[0] -1 or m == l[1] + 1 or m == l[1]-1 : return True
+                #Another loss example:  New game:  White to 4, black to 5, white to 6, black to 3, white to 7 THIS IS NOT THE MISTAKE BUT IS PROBABLY EASIER THAN THE LOGIC REQUIRED TO FIX THE MISTAKE. black to 1.  White: 4 to center, MISTAKE.  Black 1 to 0.  White center to anywhere, random. Black with forced win.  Note also that this only happens when I move first, because when the computer moves first I have to respond and I don't get the opportunity to make this mistake.
+                #Unexplained loss.  New game:W to 5, B to 4, W to 3, B to 1, W to 2 THIS IS THE ERROR, but why isn't it caught by l[0] -1 == moveobject.destination??  B to center, forced win.  This should also be caught by the forced move logic... I don't get it.
+            else: return False #count must be 0
+        else:
+            pass #currently I'm not aware of a need to do anything if I have a piece in the middle
+
+    def allowsForcedWin(self, moveobject):
+        if not self.isLegalMove(moveobject): return "BLARGH"
+        nextPosition = self.applyMove(moveobject)
+        threatmoves = nextPosition.legalMoves()
+        result = False 
+        for move in threatmoves:
+            possibleForcedWin = nextPosition.applyMove(move)
+            responses = possibleForcedWin.legalMoves()
+            allResponsesAreBlunders = True
+            for move in responses:
+                allResponsesAreBlunders = allResponsesAreBlunders and possibleForcedWin.isBlunder(move)
+            if allResponsesAreBlunders:
+                result = True
+                break
+        return allResponsesAreBlunders
+
     def notDumbMove(self):
         #generate list of candidate moves
         candidates = self.legalMoves()
         if len(candidates) == 1: return candidates[0]
 
         #check for winning moves.  return it if found
-        #BUG HERE
-        #applyMove() seems to be storing the move so there is a memory across this loop
         for move in candidates:
             nextPosition = self.applyMove(move)
             if nextPosition.isWon(): return move
 
         #eliminate moves that allow opponent to win on next turn
-        #LOGIC ERROR: IF WE'RE DEALING WITH NEW CHECKERS, WE'RE NOT CHECKING THAT THE MOVES AREN'T DUMB
         newcandidates = []
         for move in candidates:
             if self.isBlunder(move):
@@ -152,11 +187,30 @@ class Position(object):
         if len(newcandidates) == 1: return newcandidates[0]
         if len(newcandidates) == 0: return candidates[0] #we got trapped
 
+        #Eliminate moves that allow opponent to response with a move that forces a win.  This was added later and two things to note: 1 possible runtime issues, 2 this might make all my other strategery obsolete.
+        newestcandidates = []
+        for move in newcandidates:
+            if self.allowsForcedWin(move): pass
+            else: newestcandidates.append(move)
+        if len(newestcandidates) == 1: return newestcandidates[0]
+        if len(newestcandidates) == 0: return newcandidates[0] #dang this game must be harder than I thought
+        newcandidates = newestcandidates
+
         #Blocking an early trap, e.g. white is trapped ['','B','B', '', 'W', '', 'W','']
+        #this should be added to the isOpeningBlunder method
         if not self.allCheckers(): 
             for index, piece in enumerate(self.loop):
                 if piece == '' and self.loop[index-2] == '' and self.loop[index-1] == otherPlayer(self.player):
                     return Move(self.player, 'new', index)
+
+        #eliminate piece placement mistakes
+        newestcandidates = []
+        for move in newcandidates:
+            if self.isOpeningBlunder(move): pass
+            else: newestcandidates.append(move)
+        if len(newestcandidates) == 1: return newestcandidates[0]
+        if len(newestcandidates) == 0: return newcandidates[0] #man I should study this game more
+        newcandidates = newestcandidates
         
         #strategery time #SHOULD THIS SECTION BE USING newcandidates?
         if self.center == self.player: #check if the player has a piece in the middle.
